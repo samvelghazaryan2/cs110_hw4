@@ -1,29 +1,29 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="main.css">
-<html>
-	<head> 
-		<title> My TODOs </title>
-		<link rel="stylesheet" href="main.css">
-	</head>
-		<body> 
-		<div>
-		<b><h1> ToDo List Application </h1></b>
-		</div>
-		<input type="text" id="msgtxtbx" />
-		<button id="savebtn"> Save </button>
-		<br>
-		<br>
-		<input type="text" id="searchtxtbx" />
-		<button id="searchbtn"> Search </button>
-		
-		<ul id="my-todo-list">
-		</ul>
-		
-		<script src = "jquery-3.1.1.min.js"></script>
-		<script src = "main.js"> </script>
-		
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>My TODOs</title>
+	<link rel="stylesheet" href="main.css">
+	<script src = "jquery-3.1.1.min.js"></script>
+</head>
+<body>
+	<h1>My To-Do List</h1>
+	<div>
+		<div id="add">
+		<input type="text" id="create_box">
+		<button id="create_button">Add </button>
 
-		 
+	</div>
+	<div id="search">
+		<input type="text" id="search_box">
+		<button id="search_button" >Search</button>
+	</div>
+	</div>
 
-		</boody>
-		</html> 
+	<ul id="todo_ul">
+
+	</ul>
+
+<script src = "main.js"></script>
+</body>
+</html>

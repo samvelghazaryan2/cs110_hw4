@@ -1,114 +1,115 @@
 'use strict' ;
-const fs = require('fs');
+const fs = require('fs') ;
 const http = require('http');
 const url = require('url');
 const querystring = require('querystring');
+let todos = [
+    {
+        id: Math.random() + '',
+        message: "Go to office hour",
+        completed: false
+    },
+    {
+        id: Math.random() + '',
+        message: "Eat lunch",
+        completed: false
+    },
+    {
+        id: Math.random() + '',
+        message: "Do homeworks",
+        completed: false
+    }
+];
 
-    const todos = [
-         {
-            id: Math.random() + '',
-            message: 'Go to office hour',
-            completed: false,
-        },
-         {
-            id: Math.random() + '',
-            message: 'Eat lunch',
-            completed: false,
-         },
-         {
-            id: Math.random() + '',
-            message: 'Do the homework',
-            completed: false,
-        }
-        ];
-
- 
-    const server = http.createServer(function(req, res) {
-
-        const filePath = '../public'+req.url;
-        fs.readFile(filePath, function(err, data) {
-            if(err) {
-                res.statusCode = 404; 
-                res.end('No file found');
-            }
-                res.statusCode = 200;
-                res.end(data);
-    });
+const httpServer = http.createServer(function(req, res){
     const parsedUrl = url.parse(req.url);
     const parsedQuery = querystring.parse(parsedUrl.query);
     const method = req.method;
 
-    if(req.url.indexOf('/todos') === 0) {
+// READ  index.html file
+    if(req.url==='/')
+    {
+        req.url='/index.html';
+    }
+    const fileLocation = '../cs110_hw4' + req.url;
+    fs.readFile(fileLocation, function(err, data){
+        if(err){
+            res.statusCode = 404;
+            return res.end('404: Sorry file not found');
+        }	else{
+            res.statusCode = 200;
+            return res.end(data);
+        }
+    });
+
+// METHOD "SEND"
     if(method === 'GET') {
+        if(req.url.indexOf('/todos') === 0) {
             res.setHeader('Content-Type', 'application/json');
             let localTodos = todos;
             if(parsedQuery.searchtext) {
                 localTodos = localTodos.filter(function(obj) {
                     return obj.message.indexOf(parsedQuery.searchtext) >= 0;
-                    });
-                }
-                return res.end(JSON.stringify({items : localTodos}));
+                });
+            }
+            return res.end(JSON.stringify({items : localTodos}));
         }
     }
-    if(req.url.indexOf('/todos') === 0) {
+// METHOD "UPDATE"
     if(method === 'PUT') {
-             // read the content of the message
-            let body = '';
-            req.on('data', function (chunk) {
+    if(req.url.indexOf('/todos') === 0) {
+    	let body = '';
+    	req.on('data', function (chunk) { 
                 body += chunk;
             });
-            req.on('end', function () {
-                let jsonObj = JSON.parse(body); // now that we have the content, convert the JSON into an object
-
-                // find the todo in our todos array and replace it with the new object
-                for(let i = 0; i < todos.length; i++) {
-                    if(todos[i].id === jsonObj.id) { // found the same object
-                        todos[i] = jsonObj; // replace the old object with the new object
+    	req.on('end', function (){
+    		let jsonObj = JSON.parse(body); 
+    		for(let i = 0; i < todos.length; i++){
+                    if(todos[i].id === (jsonObj.id)) {
+                        todos[i] = jsonObj;
                         res.setHeader('Content-Type', 'application/json');
+                        res.statusCode = 200;
                         return res.end(JSON.stringify(jsonObj));
-         }
-        }
-                res.statusCode = 404;
-                return res.end('Data was not found and can therefore not be updated');
-        });
+                    }
+                }
+    			res.statusCode = 404;
+                	return res.end('Data was not found');
+            });
             return;
-            
-            }
         }
-        //
+    }
+// METHOD "CREATE"
+    if(method === 'POST') {
         if(req.url.indexOf('/todos') === 0) {
-         if(method === 'POST') {
-
-            // read the content of the message
             let body = '';
-            req.on('data', function (chunk) {
+            req.on('data', function (chunk) { 
                 body += chunk;
             });
             req.on('end', function () {
-                let jsonObj = JSON.parse(body);  // now that we have the content, convert the JSON into an object
-                jsonObj.id = Math.random() + ''; // assign an id to the new object
-                todos[todos.length] = jsonObj;   // store the new object into our array (our 'database')
-
+                let jsonObj = JSON.parse(body); 
+                jsonObj.id = Math.random() + '';
+                todos[todos.length] = jsonObj;
                 res.setHeader('Content-Type', 'application/json');
                 return res.end(JSON.stringify(jsonObj));
             });
             return;
         }
     }
+//METHOD "DELETE"
+    if(method === 'DELETE') {
         if(req.url.indexOf('/todos/') === 0) {
-            if (method === 'DELETE') {
             let id =  req.url.substr(7);
-            for(let i = 0; i < todos.length; i++) {
+                for(let i = 0; i < todos.length; i++) {
                 if(id === todos[i].id) {
-                    todos.splice(i, 1);
+                    todos.splice(i, 1); //delete index
                     res.statusCode = 200;
                     return res.end('Successfully removed');
                 }
             }
             res.statusCode = 404;
             return res.end('Data was not found');
-        
-    }
         }
-    });
-        server.listen(3001);
+    }
+});
+
+httpServer.listen(3001);
